@@ -87,6 +87,8 @@ __kernel void bruteforce_matcher(__global const float* train,
         }
     }
 
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     // итак, мы нашли два лучших сопоставления для наших KEYPOINTS_PER_WG дескрипторов, надо сохрнить эти результаты в глобальную память
     if (dim_id < KEYPOINTS_PER_WG * 2) { // полагаемся на то что нам надо прогрузить KEYPOINTS_PER_WG*2==4*2<dim_id<=NDIM==128
         int query_local_i = dim_id / 2;
