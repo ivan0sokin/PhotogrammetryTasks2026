@@ -71,14 +71,14 @@ __kernel void bruteforce_matcher(__global const float* train,
                 #define SECOND_BEST_INDEX 1
 
                 // пытаемся улучшить самое лучшее сопоставление для локального дескриптора
-                if (dist2 <= res_distance2_local[query_local_i * 2 + BEST_INDEX]) {
+                if (dist2 < res_distance2_local[query_local_i * 2 + BEST_INDEX]) {
                     // не забываем что прошлое лучшее сопоставление теперь стало вторым по лучшевизне (на данный момент)
                     res_distance2_local[query_local_i * 2 + SECOND_BEST_INDEX] = res_distance2_local[query_local_i * 2 + BEST_INDEX];
                     res_train_idx_local[query_local_i * 2 + SECOND_BEST_INDEX] = res_train_idx_local[query_local_i * 2 + BEST_INDEX];
                     // TODO заменяем нашим (dist2, train_idx) самое лучшее сопоставление для локального дескриптора
                     res_distance2_local[query_local_i * 2 + BEST_INDEX] = dist2;
                     res_train_idx_local[query_local_i * 2 + BEST_INDEX] = train_idx;
-                } else if (dist2 <= res_distance2_local[query_local_i * 2 + SECOND_BEST_INDEX]) { // может мы улучшили хотя бы второе по лучшевизне сопоставление?
+                } else if (dist2 < res_distance2_local[query_local_i * 2 + SECOND_BEST_INDEX]) { // может мы улучшили хотя бы второе по лучшевизне сопоставление?
                     // TODO заменяем второе по лучшевизне сопоставление для локального дескриптора
                     res_distance2_local[query_local_i * 2 + SECOND_BEST_INDEX] = dist2;
                     res_train_idx_local[query_local_i * 2 + SECOND_BEST_INDEX] = train_idx;
