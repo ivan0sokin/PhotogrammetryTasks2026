@@ -1,3 +1,4 @@
+#include <exception>
 #include <gtest/gtest.h>
 
 #include <opencv2/core.hpp>
@@ -19,9 +20,9 @@
 
 
 // TODO enable both toggles for testing custom detector & matcher
-#define ENABLE_MY_DESCRIPTOR 0
-#define ENABLE_MY_MATCHING 0
-#define ENABLE_GPU_BRUTEFORCE_MATCHER 0
+#define ENABLE_MY_DESCRIPTOR 1
+#define ENABLE_MY_MATCHING 1
+#define ENABLE_GPU_BRUTEFORCE_MATCHER 1
 
 // TODO disable for local testing but do not commit
 #define SERVER_TESTING 1
