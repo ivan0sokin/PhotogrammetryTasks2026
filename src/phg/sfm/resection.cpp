@@ -104,6 +104,15 @@ namespace {
         int best_support = 0;
         cv::Matx34d best_P;
 
+        if (n_points == n_samples) {
+            std::vector<cv::Vec3d> unprojected(n_points);
+            for (int i = 0; i < n_points; ++i) {
+                unprojected[i] = calib.unproject(x[i]);
+            }
+
+            return estimateCameraMatrixDLT(X.data(), unprojected.data(), n_points);
+        }
+
         std::vector<int> sample;
         for (int i_trial = 0; i_trial < n_trials; ++i_trial) {
             phg::randomSample(sample, n_points, n_samples, &seed);

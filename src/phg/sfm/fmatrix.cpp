@@ -165,6 +165,19 @@ namespace {
             throw std::runtime_error("estimateFMatrixRANSAC : failed to estimate fundamental matrix");
         }
 
+        std::vector<cv::Vec2d> ms0, ms1;
+        for (int i = 0; i < n_matches; ++i) {
+            if (phg::epipolarTest(m0[i], m1[i], best_F, threshold_px) && phg::epipolarTest(m1[i], m0[i], best_F.t(), threshold_px)) {
+                ms0.push_back(m0_t[i]); 
+                ms1.push_back(m1_t[i]);
+            }
+        }
+
+        if (ms0.size() >= 8) {
+            best_F = estimateFMatrixDLT(ms0.data(), ms1.data(), ms0.size());
+            best_F = TN1.t() * best_F * TN0;
+        }
+
         return best_F;
     }
 
