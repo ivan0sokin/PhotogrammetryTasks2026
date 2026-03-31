@@ -23,7 +23,9 @@ cmake -S . -B _build `
     -DCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" `
     -DVCPKG_TARGET_TRIPLET="x64-windows" `
     -DEigen3_DIR="C:\eigen-3.4.0\share\eigen3\cmake" `
-    -DUSE_CUDA=OFF
+    -DUSE_CUDA=OFF `
+    -DBUILD_TESTING=OFF `
+    -DBUILD_EXAMPLES=OFF
 if ($LASTEXITCODE -ne 0) { throw "cmake configure failed" }
 
 cmake --build _build --config Release --parallel
