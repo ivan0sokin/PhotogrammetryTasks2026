@@ -9,7 +9,7 @@ if ($LASTEXITCODE -ne 0) { throw "git pull failed" }
 .\bootstrap-vcpkg.bat
 if ($LASTEXITCODE -ne 0) { throw "bootstrap-vcpkg failed" }
 
-.\vcpkg install eigen3 glog gflags suitesparse --triplet x64-windows
+.\vcpkg install glog gflags suitesparse --triplet x64-windows
 if ($LASTEXITCODE -ne 0) { throw "vcpkg install failed" }
 
 # Build Ceres
@@ -22,6 +22,7 @@ cmake -S . -B _build `
     -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" `
     -DCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" `
     -DVCPKG_TARGET_TRIPLET="x64-windows" `
+    -DEigen3_DIR="C:\eigen-3.4.0\share\eigen3\cmake" `
     -DUSE_CUDA=OFF
 if ($LASTEXITCODE -ne 0) { throw "cmake configure failed" }
 
