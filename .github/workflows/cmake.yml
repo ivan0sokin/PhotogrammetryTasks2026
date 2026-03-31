@@ -23,14 +23,16 @@ jobs:
           sudo apt install -y g++ cmake unzip wget
           bash .github/scripts/linux/install_opencv.sh
           bash .github/scripts/linux/install_opencl_cpu_driver.sh
-          bash .github/scripts/linux/install_eigen3.sh          
+          bash .github/scripts/linux/install_eigen3.sh
+          bash .github/scripts/linux/install_ceres_solver.sh
 
       - name: Install macos dependencies
         if: runner.os == 'macOS'
         run: |
           bash .github/scripts/macos/install_openmp.sh
           bash .github/scripts/macos/install_opencv.sh
-          bash .github/scripts/macos/install_eigen3.sh 
+          bash .github/scripts/macos/install_eigen3.sh
+          bash .github/scripts/macos/install_ceres_solver.sh
 
       - name: Install windows dependencies
         if: runner.os == 'Windows'
@@ -38,13 +40,15 @@ jobs:
         run: |
           .github/scripts/windows/install_opencv.ps1
           .github/scripts/windows/install_eigen3.ps1
+          .github/scripts/windows/install_ceres_solver.ps1
 
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'
         run: |
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
-            -DOpenCV_DIR="/opt/opencv-4.11.0/lib/cmake/opencv4"
+            -DOpenCV_DIR="/opt/opencv-4.11.0/lib/cmake/opencv4" \
+            -DCMAKE_PREFIX_PATH="/opt/ceres-solver220"
 
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
@@ -52,22 +56,31 @@ jobs:
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DOpenCV_DIR="/opt/opencv-4.11.0/lib/cmake/opencv4" \
-            -DOpenMP_ROOT="$(brew --prefix libomp)"
+            -DOpenMP_ROOT="$(brew --prefix libomp)" \
+            -DCMAKE_PREFIX_PATH="/opt/ceres-solver220"
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $OpenCV_DIR = Get-Content .deps/opencv_dir.txt
-          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DOpenCV_DIR="$OpenCV_DIR" `
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 `
+            -DOpenCV_DIR="$OpenCV_DIR" `
+            -DCMAKE_PREFIX_PATH="C:\ceres-solver220" `
+            -DCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET="x64-windows" `
             -DCMAKE_CONFIGURATION_TYPES="Debug;RelWithDebInfo"
 
       - name: Build (any OS)
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-      - name: Run test_sfm (Linux/macOS)
+      - name: Run test_ceres_solver (Linux/macOS)
         if: runner.os != 'Windows'
-        run: ./build/test_sfm
+        run: ./build/test_ceres_solver
+
+      - name: Run test_sfm_ba (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: ./build/test_sfm_ba
 
       - name: Copy OpenCV/gtest DLLs (Windows)
         if: runner.os == 'Windows'
@@ -86,7 +99,18 @@ jobs:
             Group-Object Name |
             ForEach-Object { Copy-Item $_.Group[0].FullName $exeDir -Force }
 
-      - name: Run test_sfm (Windows)
+          # Ceres vcpkg DLLs (glog, gflags, suitesparse, etc.)
+          $vcpkgBin = "C:\vcpkg\installed\x64-windows\bin"
+          if (Test-Path $vcpkgBin) {
+            Copy-Item "$vcpkgBin\*.dll" $exeDir -Force
+          }
+
+      - name: Run test_ceres_solver (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: .\build\${{ env.BUILD_TYPE }}\test_sfm.exe
+        run: .\build\${{ env.BUILD_TYPE }}\test_ceres_solver.exe
+
+      - name: Run test_sfm_ba (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: .\build\${{ env.BUILD_TYPE }}\test_sfm_ba.exe

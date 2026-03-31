@@ -44,6 +44,11 @@ find_package(Eigen3 REQUIRED)
 # 8) запомните папку куда была проведена установка Eigen3 - она имеет вид .../eigen-3.3.9/install_dir
 # 9) Добавьте в File->Settings->CMake options: -DEigen3_DIR=<ПОПРАВЬТЕ ЭТОТ ПУТЬ>/eigen-3.3.9/install_dir/share/eigen3/cmake
 
+find_package(Ceres 2.2.0 REQUIRED)
+#      Linux: выполните скрипт .github/scripts/linux/install_ceres_solver.sh
+#      Mac: выполните скрипт .github/scripts/macos/install_ceres_solver.sh
+#      Windows: выполните скрипт .github/scripts/windows/install_ceres_solver.ps1 или следуйте инструкции http://ceres-solver.org/installation.html#windows
+
 set(SOURCES
         src/phg/core/calibration.cpp
         src/phg/core/calibration.h
@@ -93,6 +98,7 @@ set(LIBRARIES
         ${OpenCV_LIBS}
         OpenMP::OpenMP_CXX
         Eigen3::Eigen
+        Ceres::ceres
         )
 
 add_library(${PROJECT_NAME} ${SOURCES})
@@ -109,10 +115,14 @@ set(TEST_LIBRARIES
         gtest_main
         )
 
-add_executable(test_sift tests/test_sift.cpp ${TEST_SOURCES})
-add_executable(test_matching tests/test_matching.cpp ${TEST_SOURCES})
-add_executable(test_sfm tests/test_sfm.cpp ${TEST_SOURCES})
+add_executable(test_sift            tests/test_sift.cpp             ${TEST_SOURCES})
+add_executable(test_matching        tests/test_matching.cpp         ${TEST_SOURCES})
+add_executable(test_sfm             tests/test_sfm.cpp              ${TEST_SOURCES})
+add_executable(test_ceres_solver    tests/test_ceres_solver.cpp     ${TEST_SOURCES})
+add_executable(test_sfm_ba          tests/test_sfm_ba.cpp           ${TEST_SOURCES})
 
-target_link_libraries(test_sift ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
-target_link_libraries(test_matching ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
-target_link_libraries(test_sfm ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
+target_link_libraries(test_sift         ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
+target_link_libraries(test_matching     ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
+target_link_libraries(test_sfm          ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
+target_link_libraries(test_ceres_solver ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
+target_link_libraries(test_sfm_ba       ${PROJECT_NAME} ${LIBRARIES} ${TEST_LIBRARIES})
