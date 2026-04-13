@@ -36,7 +36,7 @@ cv::Vec3d phg::Calibration::project(const cv::Vec3d &point) const
     double y = point[1] / point[2];
 
     // TODO 11: добавьте учет радиальных искажений (k1_, k2_) (после деления на Z, но до умножения на f)
-
+    // did i broke git?
 
     x *= f_;
     y *= f_;
